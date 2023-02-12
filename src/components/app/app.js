@@ -19,7 +19,8 @@ class App extends Component {
                 {name: 'Empire of Osman', view: 787, favourite: false, like: false, id: 1 },
                 {name: 'Ertugrul', view: 565, favourite: false, like: true, id: 2 },
                 {name: 'Omar', view: 989, favourite: true, like: false, id: 3 },
-            ]
+            ],
+            term: '',
         }
     }
 
@@ -48,11 +49,22 @@ class App extends Component {
         }))
     }
 
+    serchHandler = (arr, term) => {
+        if(term.length === 0) {
+            return arr
+        }
+        return arr.filter(item => item.name.toLowerCase().indexOf(term) > -1)
+    }
+
+    updateSearchHandler = term => this.setState ({ term })
+    
+
     render() {
-        const { data } = this.state
+        const { data, term } = this.state
         const allMoviesCount = data.length
         const favouriteMoviesCount = data.filter(c => c.favourite).length
         const favouriteLikesCount = data.filter(a => a.like).length
+        const visibleData = this.serchHandler(data, term)
 
         return (
             <div className="app font-monospace">
@@ -63,10 +75,10 @@ class App extends Component {
                  favouriteLikesCount={favouriteLikesCount}
                  />
                 <div className='serch-panel'>
-                <SearchPanel />
+                <SearchPanel updateSearchHandler={this.updateSearchHandler} />
                 <AppFilter />
                 </div>
-                < MovieList onToggleProp={this.onToggleProp} data={data} onDelete={this.onDelete} />
+                < MovieList onToggleProp={this.onToggleProp} data={visibleData} onDelete={this.onDelete} />
                 <MovieAddForm addForm={this.addForm}/>
                 </div>
                 
