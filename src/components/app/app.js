@@ -5,6 +5,8 @@ import SearchPanel from "../search-panel/search-panel"
 import AppFilter from "../app-filter/app-filter"
 import MovieList from '../movie-list/movie-list'
 import MovieAddForm from '../movies-add-form/movies-add-form'
+import { v4 as uuidv4 } from 'uuid';
+
 
 
 import './app.css'
@@ -14,38 +16,57 @@ class App extends Component {
         super(props)
         this.state = {
             data: [
-                {name: 'Empire of Osman', view: 787, favourite: false, id: 1 },
-                {name: 'Ertugrul', view: 565, favourite: false, id: 2 },
-                {name: 'Omar', view: 989, favourite: true, id: 3 },
+                {name: 'Empire of Osman', view: 787, favourite: false, like: false, id: 1 },
+                {name: 'Ertugrul', view: 565, favourite: false, like: true, id: 2 },
+                {name: 'Omar', view: 989, favourite: true, like: false, id: 3 },
             ]
         }
     }
 
-   onDelete = id => {
-   this.setState(({ data }) => ({
-    data: data.filter(c => c.id !== id)
-   }))
-   
+    onDelete = id => {
+        this.setState(({ data }) => ({
+            data: data.filter(c => c.id !== id)
+        }))
+    }
+    
+    addForm = item => {
+        const newItem = { name: item.name, view: item.view, id: uuidv4(), favourite: false, like: false }
+        this.setState(({ data }) => ({
+            data: [...data, newItem]
+        }))
     }
 
-    addForm = item => {
-        // e.preventDefault()
+    onToggleProp = (id, prop) => {
+        console.log(prop)
         this.setState(({ data }) => ({
-            data: [...data, item]
+          data:  data.map(item => {
+                if(item.id === id) {
+                    return{ ...item, [prop]: !item[prop] }
+                }
+                return item
+            })
         }))
     }
 
     render() {
         const { data } = this.state
+        const allMoviesCount = data.length
+        const favouriteMoviesCount = data.filter(c => c.favourite).length
+        const favouriteLikesCount = data.filter(a => a.like).length
+
         return (
             <div className="app font-monospace">
                 <div className="content">
-                <AppInfo />
+                <AppInfo
+                 allMoviesCount={allMoviesCount} 
+                 favouriteMoviesCount={favouriteMoviesCount} 
+                 favouriteLikesCount={favouriteLikesCount}
+                 />
                 <div className='serch-panel'>
                 <SearchPanel />
                 <AppFilter />
                 </div>
-                <MovieList data={data} onDelete={this.onDelete} />
+                < MovieList onToggleProp={this.onToggleProp} data={data} onDelete={this.onDelete} />
                 <MovieAddForm addForm={this.addForm}/>
                 </div>
                 
